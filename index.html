@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Bunga & Surat Semangat</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    height: 100vh;
+    background: radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%);
+    overflow: hidden;
+    position: relative;
+    font-family: 'Georgia', serif;
+  }
+
+  .garden {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ============ BUNGA ============ */
+  .flower {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: flowerAppear 1.5s ease-out forwards;
+  }
+
+  @keyframes flowerAppear {
+    0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  .petal {
+    position: absolute;
+    border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+    transform-origin: center bottom;
+    opacity: 0;
+    animation: petalBloom 1.2s ease-out forwards;
+  }
+
+  @keyframes petalBloom {
+    0% {
+      opacity: 0;
+      transform: rotate(var(--rot)) translateY(0) scale(0);
+    }
+    100% {
+      opacity: 0.95;
+      transform: rotate(var(--rot)) translateY(calc(var(--petal-h) * -0.35)) scale(1);
+    }
+  }
+
+  .center {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 10;
+    opacity: 0;
+    animation: centerBloom 0.8s ease-out 0.8s forwards;
+    transform: scale(0);
+  }
+
+  @keyframes centerBloom {
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .flower-glow {
+    position: absolute;
+    border-radius: 50%;
+    animation: pulse 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.25); }
+  }
+
+  /* ============ PARTIKEL ============ */
+  .particle {
+    position: fixed;
+    border-radius: 50% 0 50% 50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  @keyframes float {
+    0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(720deg) scale(0.2); }
+  }
+
+  /* ============ BINTANG ============ */
+  .star {
+    position: fixed;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.6); }
+  }
+
+  /* ============ SURAT ============ */
+  .letter-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    padding: 20px;
+  }
+
+  .letter-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .letter {
+    position: relative;
+    max-width: 560px;
+    width: 100%;
+    background: linear-gradient(145deg, #fff8e7 0%, #ffe4c4 100%);
+    border-radius: 14px;
+    padding: 45px 40px 40px;
+    box-shadow:
+      0 0 60px rgba(255, 200, 100, 0.5),
+      0 0 120px rgba(255, 150, 200, 0.3),
+      0 30px 60px rgba(0, 0, 0, 0.6),
+      inset 0 0 30px rgba(255, 220, 150, 0.4);
+    transform: scale(0.5) rotate(-8deg);
+    opacity: 0;
+    transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 2px solid #d4af37;
+  }
+
+  .letter-overlay.show .letter {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+
+  .letter::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 8px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    border-radius: 4px;
+    box-shadow: 0 0 15px #d4af37;
+  }
+
+  .letter-flower {
+    position: absolute;
+    font-size: 26px;
+    filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.8));
+    animation: sway 3s ease-in-out infinite;
+  }
+
+  .letter-flower.tl { top: 12px; left: 15px; }
+  .letter-flower.tr { top: 12px; right: 15px; animation-delay: 0.5s; }
+  .letter-flower.bl { bottom: 12px; left: 15px; animation-delay: 1s; }
+  .letter-flower.br { bottom: 12px; right: 15px; animation-delay: 1.5s; }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-10deg) scale(1); }
+    50% { transform: rotate(10deg) scale(1.1); }
+  }
+
+  .letter h1 {
+    font-size: 26px;
+    text-align: center;
+    color: #8b4513;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 2px rgba(139, 69, 19, 0.3);
+    background: linear-gradient(90deg, #c2185b, #d4af37, #c2185b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+  }
+
+  .letter-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0 20px;
+    color: #d4af37;
+    font-size: 14px;
+  }
+
+  .letter-divider::before,
+  .letter-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  }
+
+  .letter-body {
+    color: #4a3728;
+    font-size: 15.5px;
+    line-height: 1.85;
+    text-align: justify;
+  }
+
+  .letter-body p {
+    margin-bottom: 14px;
+    opacity: 0;
+    transform: translateY(15px);
+    animation: textReveal 0.8s ease-out forwards;
+  }
+
+  @keyframes textReveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .letter-body p:nth-child(1) { animation-delay: 0.6s; }
+  .letter-body p:nth-child(2) { animation-delay: 0.9s; }
+  .letter-body p:nth-child(3) { animation-delay: 1.2s; }
+  .letter-body p:nth-child(4) { animation-delay: 1.5s; }
+  .letter-body p:nth-child(5) { animation-delay: 1.8s; }
+
+  .letter-body .highlight {
+    color: #c2185b;
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  .letter-signature {
+    margin-top: 25px;
+    text-align: right;
+    color: #8b4513;
+    font-style: italic;
+    font-size: 15px;
+    opacity: 0;
+    animation: textReveal 0.8s ease-out 2.1s forwards;
+  }
+
+  .letter-signature .name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #c2185b;
+    display: block;
+    margin-top: 4px;
+    font-family: 'Brush Script MT', cursive;
+    text-shadow: 1px 1px 3px rgba(194, 24, 91, 0.3);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #c2185b, #8b1a3d);
+    color: white;
+    border: 2px solid #d4af37;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px rgba(194, 24, 91, 0.8);
+    transition: all 0.3s ease;
+    line-height: 1;
+    font-weight: bold;
+    opacity: 0;
+    animation: textReveal 0.5s ease-out 2.3s forwards;
+  }
+
+  .close-btn:hover {
+    transform: scale(1.15) rotate(90deg);
+    box-shadow: 0 0 30px rgba(194, 24, 91, 1);
+  }
+
+  /* ============ HINT ============ */
+  .hint {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    letter-spacing: 2px;
+    padding: 10px 25px;
+    border: 1px solid rgba(255, 200, 100, 0.5);
+    border-radius: 30px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+    z-index: 500;
+    animation: hintPulse 2s ease-in-out infinite;
+    transition: all 0.3s ease;
+    font-family: sans-serif;
+  }
+
+  .hint:hover {
+    background: rgba(194, 24, 91, 0.4);
+    border-color: #d4af37;
+    color: #fff;
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  @keyframes hintPulse {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(255, 200, 100, 0.3);
+      opacity: 0.8;
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(255, 200, 100, 0.7);
+      opacity: 1;
+    }
+  }
+
+  /* ============ TOMBOL SUARA ============ */
+  .sound-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 200, 100, 0.6);
+    color: #ffd54f;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(255, 200, 100, 0.4);
+  }
+
+  .sound-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 200, 100, 0.8);
+    background: rgba(194, 24, 91, 0.4);
+  }
+
+  .sound-btn.muted {
+    color: #888;
+    border-color: rgba(150, 150, 150, 0.5);
+    box-shadow: 0 0 10px rgba(150, 150, 150, 0.3);
+  }
+
+  /* ============ NOTIFIKASI SUARA ============ */
+  .audio-notice {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffd54f;
+    padding: 20px 35px;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 200, 100, 0.6);
+    font-family: sans-serif;
+    font-size: 16px;
+    z-index: 3000;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 200, 100, 0.5);
+    animation: hintPulse 2s ease-in-out infinite;
+    cursor: pointer;
+  }
+
+  .audio-notice small {
+    display: block;
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Tombol kontrol suara -->
+<button class="sound-btn" id="soundBtn" title="Hidupkan/Matikan Suara">🔊</button>
+
+<div class="garden" id="garden"></div>
+
+<!-- Hint untuk membuka surat -->
+<div class="hint" id="hint">💌 Buka Surat Semangat</div>
+
+<!-- Surat -->
+<div class="letter-overlay" id="letterOverlay">
+  <div class="letter">
+    <button class="close-btn" id="closeBtn">×</button>
+
+    <div class="letter-flower tl">🌸</div>
+    <div class="letter-flower tr">🌺</div>
+    <div class="letter-flower bl">🌷</div>
+    <div class="letter-flower br">🌻</div>
+
+    <h1>Surat Semangat Sukses</h1>
+
+    <div class="letter-divider">✦ ❀ ✦</div>
+
+    <div class="letter-body">
+      <p>Halo, <span class="highlight">Sahabat Hebat</span>,</p>
+
+      <p>Ketahuilah, setiap langkah kecil yang kamu ambil hari ini adalah bagian dari perjalanan besar menuju <span class="highlight">kesuksesan</span> yang kamu impikan. Tidak ada usaha yang sia-sia, tidak ada doa yang tak didengar.</p>
+
+      <p>Ketika lelah datang, ingatlah <span class="highlight">alasan mengapa kamu memulai</span>. Ketika ragu menghampiri, ingatlah betapa jauh kamu telah melangkah. Kamu lebih kuat dari yang kamu kira, dan lebih hebat dari yang kamu bayangkan.</p>
+
+      <p>Sukses bukanlah tentang menjadi sempurna, tetapi tentang <span class="highlight">terus bangkit setiap kali jatuh</span>, terus melangkah walau pelan, dan terus percaya bahwa hal-hal baik sedang dalam perjalanan menuju dirimu.</p>
+
+      <p>Teruslah bermimpi, teruslah berusaha, dan jangan pernah berhenti. Karena <span class="highlight">kesuksesanmu sudah menunggu di ujung perjalanan</span>. Semangat selalu, ya! 🌸</p>
+    </div>
+
+    <div class="letter-signature">
+      Dengan penuh semangat,
+      <span class="name">— Untukmu —</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const garden = document.getElementById('garden');
+  const letterOverlay = document.getElementById('letterOverlay');
+  const hint = document.getElementById('hint');
+  const closeBtn = document.getElementById('closeBtn');
+  const soundBtn = document.getElementById('soundBtn');
+
+  // ==========================================
+  // AUDIO ENGINE (Web Audio API)
+  // ==========================================
+  let audioCtx = null;
+  let soundEnabled = true;
+  let masterGain = null;
+  let ambientNodes = [];
+
+  // Inisialisasi audio context (harus setelah interaksi user)
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.35;
+    masterGain.connect(audioCtx.destination);
+  }
+
+  // Suara "pop" saat bunga muncul
+  function playBloomSound(size = 60) {
+    if (!soundEnabled || !audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    // Frekuensi berdasarkan ukuran bunga (kecil = tinggi, besar = rendah)
+    const baseFreq = 400 + (150 - size) * 4;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.2, now + 0.15);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.4);
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.5);
+  }
+
+  // Suara "chime" lembut untuk kelopak
+  function playPetalSound() {
+    if (!soundEnabled || !audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const freq = 800 + Math.random() * 600;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.6, now + 0.3);
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.05, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  // Suara partikel beterbangan (blip halus)
+  function playParticleSound() {
+    if (!soundEnabled || !audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const freq = 1200 + Math.random() * 800;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 0.15);
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.03, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+
+  // Suara bel surat dibuka
+  function playLetterOpenSound() {
+    if (!soundEnabled || !audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      const startTime = now + i * 0.1;
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.12, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.8);
+    });
+  }
+
+  // Suara tutup surat
+  function playLetterCloseSound() {
+    if (!soundEnabled || !audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const notes = [1046.5, 783.99, 659.25, 523.25];
+
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      const startTime = now + i * 0.08;
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.1, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.6);
+    });
+  }
+
+  // Suara klik untuk tambah bunga
+  function playClickFlowerSound() {
+    if (!soundEnabled || !audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
+    osc.frequency.exponentialRampToValueAtTime(1320, now + 0.25);
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  // Suara ambience latar (angin lembut + drone)
+  function startAmbient() {
+    if (!audioCtx || ambientNodes.length > 0) return;
+
+    // Drone lembut
+    const drone = audioCtx.createOscillator();
+    const droneGain = audioCtx.createGain();
+    drone.type = 'sine';
+    drone.frequency.value = 110; // A2
+    droneGain.gain.value = 0.015;
+    drone.connect(droneGain);
+    droneGain.connect(masterGain);
+    drone.start();
+    ambientNodes.push(drone);
+
+    // Drone kedua (harmoni)
+    const drone2 = audioCtx.createOscillator();
+    const drone2Gain = audioCtx.createGain();
+    drone2.type = 'sine';
+    drone2.frequency.value = 164.81; // E3
+    drone2Gain.gain.value = 0.01;
+    drone2.connect(drone2Gain);
+    drone2Gain.connect(masterGain);
+    drone2.start();
+    ambientNodes.push(drone2);
+
+    // Noise angin lembut
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = (Math.random() * 2 - 1) * 0.3;
+    }
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 400;
+
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.value = 0.02;
+
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(masterGain);
+    noise.start();
+    ambientNodes.push(noise);
+  }
+
+  // ==========================================
+  // PALET WARNA
+  // ==========================================
+  const colorPalettes = [
+    { petal: '#ff6b9d', center: '#ffeb3b', glow: '#ff1744' },
+    { petal: '#ff1744', center: '#ffc107', glow: '#ff6b9d' },
+    { petal: '#9c27b0', center: '#ffeb3b', glow: '#e91e63' },
+    { petal: '#ff9800', center: '#fff176', glow: '#ff5722' },
+    { petal: '#e91e63', center: '#ffeb3b', glow: '#ff1744' },
+    { petal: '#00bcd4', center: '#fff59d', glow: '#4dd0e1' },
+    { petal: '#8bc34a', center: '#ffeb3b', glow: '#cddc39' },
+    { petal: '#673ab7', center: '#ffc107', glow: '#9575cd' },
+    { petal: '#f44336', center: '#ffeb3b', glow: '#ff8a80' },
+    { petal: '#2196f3', center: '#fff176', glow: '#64b5f6' },
+    { petal: '#ff4081', center: '#ffeb3b', glow: '#ff80ab' },
+    { petal: '#ffc107', center: '#ff9800', glow: '#ffd54f' },
+    { petal: '#e040fb', center: '#ffeb3b', glow: '#ea80fc' },
+    { petal: '#ff5252', center: '#fff59d', glow: '#ff8a80' },
+    { petal: '#40c4ff', center: '#ffeb3b', glow: '#80d8ff' },
+    { petal: '#69f0ae', center: '#ffeb3b', glow: '#b9f6ca' }
+  ];
+
+  // ==========================================
+  // BUAT BUNGA
+  // ==========================================
+  function createFlower(x, y, size, palette, delay, playSound = true) {
+    const flower = document.createElement('div');
+    flower.className = 'flower';
+    flower.style.left = x + 'px';
+    flower.style.top = y + 'px';
+    flower.style.width = size + 'px';
+    flower.style.height = size + 'px';
+    flower.style.animationDelay = delay + 's';
+
+    const petalCount = 5 + Math.floor(Math.random() * 4);
+    const petalW = size * 0.30;
+    const petalH = size * 0.45;
+    const centerSize = petalW * 1.05;
+    const glowSize = size * 0.9;
+
+    // Suara bloom saat bunga muncul
+    if (playSound) {
+      setTimeout(() => playBloomSound(size), delay * 1000);
+    }
+
+    // Glow
+    const glow = document.createElement('div');
+    glow.className = 'flower-glow';
+    glow.style.width = glowSize + 'px';
+    glow.style.height = glowSize + 'px';
+    glow.style.background = `radial-gradient(circle, ${palette.glow}66, transparent 70%)`;
+    glow.style.animationDelay = delay + 's';
+    flower.appendChild(glow);
+
+    // Kelopak
+    for (let i = 0; i < petalCount; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      const rotation = (360 / petalCount) * i;
+      petal.style.setProperty('--rot', rotation + 'deg');
+      petal.style.setProperty('--petal-h', petalH + 'px');
+      petal.style.width = petalW + 'px';
+      petal.style.height = petalH + 'px';
+      petal.style.background = `radial-gradient(ellipse at center bottom, ${palette.petal}ff, ${palette.petal}cc, ${palette.glow})`;
+      petal.style.boxShadow = `0 0 ${petalW * 0.3}px ${palette.glow}88`;
+      petal.style.animationDelay = (delay + 0.15 * i) + 's';
+      flower.appendChild(petal);
+
+      // Suara kelopak (hanya beberapa agar tidak terlalu ramai)
+      if (playSound && i % 3 === 0) {
+        setTimeout(() => playPetalSound(), (delay + 0.15 * i) * 1000);
+      }
+    }
+
+    // Inti
+    const center = document.createElement('div');
+    center.className = 'center';
+    center.style.width = centerSize + 'px';
+    center.style.height = centerSize + 'px';
+    center.style.background = `radial-gradient(circle, ${palette.center}ff, ${palette.center}cc, ${palette.glow})`;
+    center.style.boxShadow = `0 0 ${centerSize * 0.5}px ${palette.center}, 0 0 ${centerSize}px ${palette.glow}`;
+    center.style.animationDelay = (delay + 0.8) + 's';
+    flower.appendChild(center);
+
+    // Serbuk sari
+    const dotCount = 5;
+    const dotSize = centerSize * 0.12;
+    for (let i = 0; i < dotCount; i++) {
+      const dot = document.createElement('div');
+      const angle = (360 / dotCount) * i + 25;
+      const rad = (angle * Math.PI) / 180;
+      const dist = centerSize * 0.25;
+      dot.style.position = 'absolute';
+      dot.style.width = dotSize + 'px';
+      dot.style.height = dotSize + 'px';
+      dot.style.borderRadius = '50%';
+      dot.style.background = palette.glow;
+      dot.style.boxShadow = `0 0 ${dotSize}px ${palette.glow}`;
+      dot.style.left = `calc(50% + ${Math.cos(rad) * dist}px)`;
+      dot.style.top = `calc(50% + ${Math.sin(rad) * dist}px)`;
+      dot.style.transform = 'translate(-50%, -50%)';
+      dot.style.zIndex = '11';
+      dot.style.opacity = '0';
+      dot.style.animation = `centerBloom 0.5s ease-out ${delay + 1 + i * 0.1}s forwards`;
+      flower.appendChild(dot);
+    }
+
+    garden.appendChild(flower);
+  }
+
+  // Bintang
+  function createStars() {
+    for (let i = 0; i < 200; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = 1 + Math.random() * 2.5;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + 'vw';
+      star.style.top = Math.random() * 100 + 'vh';
+      star.style.animationDelay = Math.random() * 3 + 's';
+      star.style.animationDuration = (2 + Math.random() * 3) + 's';
+      const starColors = ['#ffffff', '#fff59d', '#bbdefb', '#f8bbd0'];
+      const color = starColors[Math.floor(Math.random() * starColors.length)];
+      star.style.background = color;
+      star.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+      garden.appendChild(star);
+    }
+  }
+
+  // Partikel
+  function createParticles() {
+    setInterval(() => {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+      const size = 4 + Math.random() * 8;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.background = `radial-gradient(circle, ${palette.petal}, ${palette.glow})`;
+      particle.style.boxShadow = `0 0 ${size}px ${palette.glow}`;
+      particle.style.left = Math.random() * 100 + 'vw';
+      particle.style.top = (100 + Math.random() * 10) + 'vh';
+      const x = (Math.random() - 0.5) * 200;
+      const y = -(200 + Math.random() * 400);
+      particle.style.setProperty('--x', x + 'px');
+      particle.style.setProperty('--y', y + 'px');
+      const duration = 5 + Math.random() * 5;
+      particle.style.animation = `float ${duration}s ease-out forwards`;
+      document.body.appendChild(particle);
+
+      // Suara partikel (jarang)
+      if (Math.random() < 0.15) playParticleSound();
+
+      setTimeout(() => particle.remove(), duration * 1000);
+    }, 150);
+  }
+
+  // Tanam taman (dengan suara)
+  function plantGarden() {
+    const count = 80;
+    for (let i = 0; i < count; i++) {
+      const x = Math.random() * (window.innerWidth - 120);
+      const y = Math.random() * (window.innerHeight - 120);
+      const size = 35 + Math.random() * 110;
+      const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+      const delay = Math.random() * 4;
+
+      setTimeout(() => {
+        createFlower(x, y, size, palette, 0, i < 20); // 20 bunga pertama bersuara
+      }, delay * 1000);
+    }
+  }
+
+  // Init
+  window.addEventListener('load', () => {
+    createStars();
+    plantGarden();
+    setTimeout(createParticles, 2000);
+
+    // Tampilkan notifikasi untuk mengaktifkan audio
+    setTimeout(showAudioNotice, 800);
+  });
+
+  // Notifikasi aktivasi audio
+  function showAudioNotice() {
+    const notice = document.createElement('div');
+    notice.className = 'audio-notice';
+    notice.innerHTML = '🎵 Klik di mana saja untuk menyalakan suara bunga 🎵<small>(Browser memerlukan interaksi sebelum memutar audio)</small>';
+    document.body.appendChild(notice);
+
+    const activateAudio = () => {
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      startAmbient();
+
+      // Suara selamat datang
+      setTimeout(() => playLetterOpenSound(), 200);
+
+      notice.style.opacity = '0';
+      notice.style.transition = 'opacity 0.5s';
+      setTimeout(() => notice.remove(), 500);
+
+      document.removeEventListener('click', activateAudio);
+      document.removeEventListener('touchstart', activateAudio);
+      document.removeEventListener('keydown', activateAudio);
+    };
+
+    document.addEventListener('click', activateAudio);
+    document.addEventListener('touchstart', activateAudio);
+    document.addEventListener('keydown', activateAudio);
+  }
+
+  // Klik taman untuk tambah bunga + suara
+  document.body.addEventListener('click', (e) => {
+    if (letterOverlay.classList.contains('show')) return;
+    if (e.target.closest('.hint, .close-btn, .sound-btn, .letter, .audio-notice')) return;
+
+    const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+    const size = 50 + Math.random() * 80;
+    createFlower(e.clientX - size / 2, e.clientY - size / 2, size, palette, 0, false);
+    playClickFlowerSound();
+  });
+
+  // Tambah bunga terus (tanpa suara agar tidak berisik)
+  setInterval(() => {
+    if (document.querySelectorAll('.flower').length < 200) {
+      const x = Math.random() * (window.innerWidth - 120);
+      const y = Math.random() * (window.innerHeight - 120);
+      const size = 35 + Math.random() * 100;
+      const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+      createFlower(x, y, size, palette, 0, false);
+
+      // Sesekali ada suara
+      if (Math.random() < 0.08) playBloomSound(size);
+    }
+  }, 400);
+
+  // ==========================================
+  // BUKA & TUTUP SURAT
+  // ==========================================
+  function openLetter() {
+    letterOverlay.classList.add('show');
+    hint.style.opacity = '0';
+    hint.style.pointerEvents = 'none';
+    playLetterOpenSound();
+  }
+
+  function closeLetter() {
+    letterOverlay.classList.remove('show');
+    setTimeout(() => {
+      hint.style.opacity = '1';
+      hint.style.pointerEvents = 'auto';
+    }, 800);
+    playLetterCloseSound();
+  }
+
+  hint.addEventListener('click', openLetter);
+  closeBtn.addEventListener('click', closeLetter);
+
+  letterOverlay.addEventListener('click', (e) => {
+    if (e.target === letterOverlay) closeLetter();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && letterOverlay.classList.contains('show')) {
+      closeLetter();
+    }
+  });
+
+  setTimeout(() => {
+    if (!letterOverlay.classList.contains('show')) openLetter();
+  }, 6000);
+
+  // ==========================================
+  // TOMBOL KONTROL SUARA
+  // ==========================================
+  soundBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    soundEnabled = !soundEnabled;
+    soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+    soundBtn.classList.toggle('muted', !soundEnabled);
+
+    if (soundEnabled && masterGain) {
+      masterGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+      playBloomSound(80);
+    } else if (masterGain) {
+      masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    }
+  });
+</script>
+
+</body>
+</html>
